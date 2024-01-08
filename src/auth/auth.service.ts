@@ -58,7 +58,7 @@ export class AuthService {
     if (type == UserRolesEnum.Admin) {
       user = await this.adminRepo.findOne({
         where: { id: id, email },
-        select: selectPass ? ['password'] : undefined,
+        select: selectPass ? ['id', 'password'] : undefined,
       });
     }
     console.log('user is', user);

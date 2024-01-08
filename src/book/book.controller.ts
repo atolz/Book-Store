@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Put, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Put,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { BookService } from './book.service';
 import { Book } from './book.model';
 import { Book as BookEntity } from './book.entity';
@@ -6,6 +15,9 @@ import { CreateBookDTO } from './dtos/create-book.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateBookDTO } from './dtos/update-book.dto';
 import { QueryBookDto } from './dtos/query-book.dto';
+import { RoleGuard } from 'src/auth/role.guard';
+import { AllowRoles } from 'src/auth/role.decorator';
+import { UserRolesEnum } from 'src/users/users.enum';
 // import { CreateBookDTO } from './dtos/create-book.dto';
 @ApiBearerAuth()
 @ApiTags('books')
@@ -24,6 +36,8 @@ export class BookController {
     return this.bookService.getAllBooks(query);
   }
 
+  @AllowRoles(UserRolesEnum.Author, UserRolesEnum.Admin)
+  @UseGuards(RoleGuard)
   @Post()
   @ApiResponse({
     status: 201,

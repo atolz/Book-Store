@@ -19,7 +19,6 @@ export abstract class BaseUserModel {
   email: string;
   @Column({
     default: UserRolesEnum.User,
-    select: false,
     enum: UserRolesEnum,
     type: 'enum',
   })

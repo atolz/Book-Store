@@ -7,6 +7,10 @@ import { books } from './book-list.const';
 import { QueryBookDto } from './dtos/query-book.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UsersService } from 'src/users/users.service';
+import { UserRolesEnum } from 'src/users/users.enum';
+import { AuthorEntity } from 'src/users/author.entity';
+import { CreateBookDTO } from './dtos/create-book.dto';
 // import { CreateBookDTO } from './dtos/create-book.dto';
 
 @Injectable()
@@ -15,6 +19,7 @@ export class BookService {
 
   constructor(
     @InjectRepository(BookEntity) private bookRepo: Repository<BookEntity>,
+    private userService: UsersService,
   ) {}
 
   getAllBooks = (query: QueryBookDto): Book[] => {
@@ -29,8 +34,17 @@ export class BookService {
     return this.books;
   };
 
-  addBook = async (book: Book): Promise<BookEntity> => {
-    const newBook = this.bookRepo.create(book);
+  addBook = async (
+    data: CreateBookDTO,
+    authorId: string,
+  ): Promise<BookEntity> => {
+    const author: AuthorEntity = await this.userService.getUser(
+      authorId,
+      undefined,
+      UserRolesEnum.Author,
+    );
+
+    const newBook = this.bookRepo.create({ ...data, author });
     return await this.bookRepo.save(newBook);
     // this.books.push(book);
     // console.log(this.books);

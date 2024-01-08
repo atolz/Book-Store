@@ -22,10 +22,9 @@ export class Book {
   @Column()
   name: string;
 
-  @ManyToOne(() => AuthorEntity, (author) => author.books)
-  author: string;
-  @Column()
-  email: string;
+  @ManyToOne(() => AuthorEntity, (author) => author.books, { cascade: true })
+  author: AuthorEntity;
+
   @Column()
   sales: number;
   @Column()

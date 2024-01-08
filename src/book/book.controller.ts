@@ -7,6 +7,7 @@ import {
   Param,
   Query,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { BookService } from './book.service';
 import { Book } from './book.model';
@@ -44,11 +45,14 @@ export class BookController {
     type: CreateBookDTO,
     description: 'The record has been successfully created.',
   })
-  async addBook(@Body() book: CreateBookDTO): Promise<BookEntity> {
-    console.log('in book controller', book);
-    // console.log(typeof likes === 'number');
+  async addBook(
+    @Body() book: CreateBookDTO,
+    @Request() req: Request,
+  ): Promise<BookEntity> {
+    // console.log('in book controller', book);
+    const { user } = req as { user?: { id: string; role: string } };
 
-    return this.bookService.addBook(book);
+    return this.bookService.addBook(book, user.id);
   }
   @Put(':name')
   @ApiResponse({

@@ -2,10 +2,14 @@
 import { IsEmail, IsString } from 'class-validator';
 
 export class signInDto {
-  /** @example 'love@gmail.com' */
+  /**
+   *  @example 'love@gmail.com'
+   * */
   @IsEmail()
   email: string;
-  /**@example 'passsord' */
+  /**
+   * @example 'password'
+   */
   @IsString()
   password: string;
 }

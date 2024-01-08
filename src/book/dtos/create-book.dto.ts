@@ -5,17 +5,12 @@ import {
   IsEnum,
   // Allow,
   IsArray,
-  IsEmail,
-  IsDateString,
   // ValidateIf,
   IsString,
-  isDateString,
   ArrayUnique,
   ArrayNotEmpty,
-  // IsEmpty,
-  // IsDate,
+  IsNotEmpty,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum BookGenres {
@@ -31,48 +26,30 @@ export class CreateBookDTO {
     description: 'Name of the book',
     example: 'Default book name',
   })
-  // @IsNotEmpty()
+  @IsNotEmpty()
   @IsString()
   name: string;
-  @ApiProperty()
-  @IsString()
-  author: string;
-  @ApiProperty({
-    example: 'ade@gmail.com',
-  })
-  // @ValidateIf((obj) => {
-  //   console.log('email is', obj.email);
-  //   obj.email = obj.email?.trim();
-  //   return true;
+
+  // @IsDateString(
+  //   { strict: true, strictSeparator: true },
+  //   {
+  //     message:
+  //       'createDate must be a valid ISO 8601 date string eg: 2023-01-15T14:30:00.000Z or yyyy-mm-dd or yyyy-mm or yyyy - slashes not accepted',
+  //   },
+  // )
+  // @Transform(({ value }) => {
+  //   console.log('Transforming Date', value, new Date(value));
+  //   if (isDateString(value)) {
+  //     return new Date(value).toISOString();
+  //   }
+  //   return value;
   // })
-  @IsEmail()
-  email: string;
-  @IsDateString(
-    { strict: true, strictSeparator: true },
-    {
-      message:
-        'createDate must be a valid ISO 8601 date string eg: 2023-01-15T14:30:00.000Z or yyyy-mm-dd or yyyy-mm or yyyy - slashes not accepted',
-    },
-  )
-  @Transform(({ value }) => {
-    console.log('Transforming Date', value, new Date(value));
-    if (isDateString(value)) {
-      return new Date(value).toISOString();
-    }
-    return value;
-  })
   // @IsDate()
-  @ApiProperty({ format: 'date-time' })
-  createDate: string;
-  // @IsNotEmpty()
+  // @ApiProperty({ format: 'date-time' })
+  // createDate: string;
   @IsNumber()
   @ApiProperty()
   sales: number;
-  // @IsNotEmpty()
-  // @ValidateIf((obj, value) => {
-  //   console.log('in validate if', obj, value);
-  //   return true;
-  // })
   @ApiProperty({
     minimum: 1,
     default: 1,

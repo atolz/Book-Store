@@ -32,7 +32,7 @@ export class BookController {
     type: [CreateBookDTO],
     description: 'The record has been successfully created.',
   })
-  getBooks(@Query() query: QueryBookDto): Book[] {
+  getBooks(@Query() query: QueryBookDto): Promise<any> {
     console.log('query is', query);
     return this.bookService.getAllBooks(query);
   }
@@ -54,6 +54,7 @@ export class BookController {
 
     return this.bookService.addBook(book, user.id);
   }
+
   @Put(':name')
   @ApiResponse({
     status: 201,

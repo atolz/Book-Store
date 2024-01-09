@@ -10,6 +10,7 @@ import {
   ArrayUnique,
   ArrayNotEmpty,
   IsNotEmpty,
+  IsOptional,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -29,6 +30,13 @@ export class CreateBookDTO {
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  /**
+   * @example 'A simple description on a book'
+   */
+  @IsString()
+  @IsOptional()
+  description: string;
 
   // @IsDateString(
   //   { strict: true, strictSeparator: true },

@@ -5,7 +5,13 @@ import { Book as BookEntity } from './book.entity';
 import { UpdateBookDTO } from './dtos/update-book.dto';
 import { books } from './book-list.const';
 import { QueryBookDto } from './dtos/query-book.dto';
-import { Repository } from 'typeorm';
+import {
+  // ArrayContainedBy,
+  // ArrayContains,
+  ArrayOverlap,
+  ILike,
+  Repository,
+} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { UserRolesEnum } from 'src/users/users.enum';
@@ -22,16 +28,83 @@ export class BookService {
     private userService: UsersService,
   ) {}
 
-  getAllBooks = (query: QueryBookDto): Book[] => {
-    const { page, limit, genre } = query;
-    console.log(page, limit, genre);
+  getAllBooks = async (
+    query: QueryBookDto,
+  ): Promise<{
+    data: BookEntity[];
+    pagination: { page: number; limit: number; total: number };
+  }> => {
+    const { page, limit = 100, genre, search } = query;
+    console.log(page, limit, genre, search);
 
-    if (page && limit) {
-      const from = (page - 1) * limit;
-      const to = limit ? page * limit : null;
-      return this.books.slice(from, to);
-    }
-    return this.books;
+    const books: [BookEntity[], number] = await this.bookRepo.findAndCount({
+      where: [
+        {
+          name: ILike(`%${search}%`),
+        },
+        {
+          description: ILike(`%${search}%`),
+        },
+        {
+          author: {
+            name: ILike(`%${search}%`),
+          },
+        },
+        { genre: ArrayOverlap([genre]) },
+      ],
+
+      relations: { author: { books: false } },
+      select: {
+        author: {
+          id: true,
+          name: true,
+          books: { id: true },
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    // const bookQuery = this.bookRepo.createQueryBuilder().where({});
+
+    // if (search) {
+    //   bookQuery.andWhere('name ILIKE :search OR description ILIKE :search', {
+    //     search: `%${search}%`, // Assuming you want to perform a case-insensitive partial match
+    //   });
+    // }
+    // console.log('query is', bookQuery.getSql());
+    // if (page) {
+    //   const skipAmount = (page - 1) * limit;
+    //   bookQuery.skip(skipAmount).take(limit);
+    // }
+
+    // books = await bookQuery.getMany();
+
+    const data = {
+      pagination: { page: page, limit, total: books[1] },
+      data: books[0],
+    };
+
+    // https://exercism.org/api/v2/hiring/testimonials?page=1&exercise=&order=newest_first
+    //   "pagination": {
+    //     "current_page": 1,
+    //     "total_count": 4322,
+    //     "total_pages": 217
+    // },
+
+    //   https://exercism.org/api/v2/hiring/testimonials?page=1&track=c&exercise=&order=newest_first
+    //   "pagination": {
+    //     "current_page": 1,
+    //     "total_count": 202,
+    //     "total_pages": 11
+    // },
+
+    // if (page && limit) {
+    //   const from = (page - 1) * limit;
+    //   const to = limit ? page * limit : null;
+    //   return this.books.slice(from, to);
+    // }
+    return data;
   };
 
   addBook = async (
@@ -44,7 +117,8 @@ export class BookService {
       UserRolesEnum.Author,
     );
 
-    const newBook = this.bookRepo.create({ ...data, author });
+    const newBook = this.bookRepo.create(data);
+    newBook.author = author;
     return await this.bookRepo.save(newBook);
     // this.books.push(book);
     // console.log(this.books);

@@ -7,26 +7,29 @@ import {
   IsOptional,
   IsString,
   Min,
-  ValidateIf,
 } from 'class-validator';
 import { BookGenres } from './create-book.dto';
 // import { Transform } from 'class-transformer';
 
 export class QueryBookDto {
-  //   @ApiQuery({ description: 'de' })
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
+  search: string;
+  @ApiProperty({ default: 1 })
   @IsNumber()
   @Min(1)
   @IsOptional()
-  @ValidateIf((val) => val.limit)
   page: number;
-  @ApiProperty()
+  @ApiProperty({ default: 100 })
   @IsNumber()
   @Min(1)
   @IsOptional()
-  @ValidateIf((val) => val.page)
   limit: number;
-  @ApiProperty()
+
+  /**
+   * @example 'Romance'
+   */
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   //   @IsArray()
@@ -37,5 +40,5 @@ export class QueryBookDto {
   //     return o;
   //   })
   @IsEnum(BookGenres, { each: true })
-  genre: string;
+  genre?: string;
 }

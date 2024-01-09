@@ -21,6 +21,8 @@ export class Book {
   id: string;
   @Column()
   name: string;
+  @Column()
+  description: string;
 
   @ManyToOne(() => AuthorEntity, (author) => author.books, { cascade: true })
   author: AuthorEntity;

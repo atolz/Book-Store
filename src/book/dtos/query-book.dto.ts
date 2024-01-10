@@ -14,17 +14,17 @@ import { BookGenres } from './create-book.dto';
 export class QueryBookDto {
   @ApiProperty({ required: false })
   @IsOptional()
-  search: string;
-  @ApiProperty({ default: 1 })
+  search?: string;
+  @ApiProperty({ default: 1, required: false })
   @IsNumber()
   @Min(1)
   @IsOptional()
-  page: number;
-  @ApiProperty({ default: 100 })
+  page?: number;
+  @ApiProperty({ default: 100, required: false })
   @IsNumber()
   @Min(1)
   @IsOptional()
-  limit: number;
+  limit?: number;
 
   /**
    * @example 'Romance'

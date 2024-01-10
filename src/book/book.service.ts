@@ -32,26 +32,39 @@ export class BookService {
     query: QueryBookDto,
   ): Promise<{
     data: BookEntity[];
-    pagination: { page: number; limit: number; total: number };
+    pagination: {
+      current_page: number;
+      per_page: number;
+      total_pages: number;
+      total_count: number;
+      showing: number[] & any[];
+    };
   }> => {
-    const { page, limit = 100, genre, search } = query;
+    let { page = 1, limit } = query;
+    const { genre, search } = query;
     console.log(page, limit, genre, search);
+    if (page || limit) {
+      (page = page ?? 1), (limit = limit ?? 100);
+    }
 
     const books: [BookEntity[], number] = await this.bookRepo.findAndCount({
-      where: [
-        {
-          name: ILike(`%${search}%`),
-        },
-        {
-          description: ILike(`%${search}%`),
-        },
-        {
-          author: {
-            name: ILike(`%${search}%`),
-          },
-        },
-        { genre: ArrayOverlap([genre]) },
-      ],
+      where:
+        search || genre
+          ? [
+              {
+                name: ILike(`%${search}%`),
+              },
+              {
+                description: ILike(`%${search}%`),
+              },
+              {
+                author: {
+                  name: ILike(`%${search}%`),
+                },
+              },
+              { genre: genre ? ArrayOverlap([genre]) : undefined },
+            ]
+          : {},
 
       relations: { author: { books: false } },
       select: {
@@ -61,7 +74,7 @@ export class BookService {
           books: { id: true },
         },
       },
-      skip: (page - 1) * limit,
+      skip: page && limit ? (page - 1) * limit : undefined,
       take: limit,
     });
 
@@ -81,7 +94,19 @@ export class BookService {
     // books = await bookQuery.getMany();
 
     const data = {
-      pagination: { page: page, limit, total: books[1] },
+      pagination: {
+        current_page: page ?? 1,
+        per_page: limit ?? books[1],
+        total_pages: limit ? Math.ceil(books[1] / limit) : 1,
+        total_count: books[1],
+        showing:
+          page && limit && page <= Math.ceil(books[1] / limit)
+            ? [
+                (page - 1) * limit + 1,
+                page * limit > books[1] ? books[1] : page * limit,
+              ]
+            : [],
+      },
       data: books[0],
     };
 

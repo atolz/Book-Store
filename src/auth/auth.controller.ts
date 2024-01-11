@@ -18,6 +18,7 @@ import { AuthorEntity } from 'src/users/author.entity';
 import { AdminEntity } from 'src/users/admin.entity';
 import { SignUpAuthorDTO } from './dtos/signup-author.dto';
 import { RegisterAdminDTO } from './dtos/signup-admin.dto';
+import { VerifyEmailDTO } from './dtos/verify-email.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -54,6 +55,18 @@ export class AuthController {
   @Public()
   @Post('signup/admin')
   signUpAdmin(@Body() details: RegisterAdminDTO): Promise<AdminEntity> {
+    return this.authService.signUp(details, UserRolesEnum.Admin);
+  }
+
+  @Public()
+  @Post('verify-email')
+  verifyAccount(@Body() data: VerifyEmailDTO): Promise<{ message: string }> {
+    return this.authService.sendVerificationEmail(data.email);
+  }
+
+  @Public()
+  @Post('verify-otp')
+  verifyOTP(@Body() details: RegisterAdminDTO): Promise<AdminEntity> {
     return this.authService.signUp(details, UserRolesEnum.Admin);
   }
 

@@ -8,12 +8,14 @@ import { UsersModule } from './users/users.module';
 import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
     BookModule,
     UsersModule,
     AuthModule,
+    EmailModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

@@ -16,6 +16,7 @@ import { AuthorEntity } from 'src/users/author.entity';
 import { signUpDto } from './dtos/singup.dto';
 import { SignUpAuthorDTO } from './dtos/signup-author.dto';
 import { RegisterAdminDTO } from './dtos/signup-admin.dto';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,7 @@ export class AuthService {
     @InjectRepository(AuthorEntity)
     private authorRepo: Repository<AuthorEntity>,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async genToken(user: User) {
@@ -158,5 +160,13 @@ export class AuthService {
       data: newUser,
       token,
     };
+  }
+
+  async sendVerificationEmail(email: string): Promise<{ message: string }> {
+    const sent: string = await this.emailService.sendEmail(
+      email,
+      'atolagbeelisha001@gmail.com',
+    );
+    return { message: sent };
   }
 }

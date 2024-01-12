@@ -9,6 +9,8 @@ import { AuthService } from './auth/auth.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { EmailModule } from './email/email.module';
+import { OtpService } from './otp/otp.service';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -34,8 +36,9 @@ import { EmailModule } from './email/email.module';
         expiresIn: '1d',
       },
     }),
+    OtpModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthService],
+  providers: [AppService, AuthService, OtpService],
 })
 export class AppModule {}

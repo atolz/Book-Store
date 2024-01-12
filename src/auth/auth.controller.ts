@@ -59,9 +59,19 @@ export class AuthController {
   }
 
   @Public()
+  @ApiQuery({
+    name: 'type',
+    enum: UserRolesEnum,
+    description: 'Specify kind of account',
+    style: 'spaceDelimited',
+    required: false,
+  })
   @Post('verify-email')
-  verifyAccount(@Body() data: VerifyEmailDTO): Promise<{ message: string }> {
-    return this.authService.sendVerificationEmail(data.email);
+  verifyAccount(
+    @Body() data: VerifyEmailDTO,
+    @Query('type') type: UserRolesEnum,
+  ): Promise<{ message: string }> {
+    return this.authService.sendVerificationEmail(data.email, type);
   }
 
   @Public()

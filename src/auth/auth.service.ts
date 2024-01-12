@@ -17,6 +17,9 @@ import { signUpDto } from './dtos/singup.dto';
 import { SignUpAuthorDTO } from './dtos/signup-author.dto';
 import { RegisterAdminDTO } from './dtos/signup-admin.dto';
 import { EmailService } from 'src/email/email.service';
+import { EmailOptions } from 'src/email/email.model';
+import { OtpService } from 'src/otp/otp.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +30,8 @@ export class AuthService {
     private authorRepo: Repository<AuthorEntity>,
     private jwtService: JwtService,
     private emailService: EmailService,
+    private otpService: OtpService,
+    private userService: UsersService,
   ) {}
 
   async genToken(user: User) {
@@ -162,11 +167,22 @@ export class AuthService {
     };
   }
 
-  async sendVerificationEmail(email: string): Promise<{ message: string }> {
-    const sent: string = await this.emailService.sendEmail(
-      email,
-      'atolagbeelisha001@gmail.com',
-    );
-    return { message: sent };
+  async sendVerificationEmail(
+    email: string,
+    userType: UserRolesEnum,
+  ): Promise<{ message: string }> {
+    const user = await this.userService.getUser(undefined, email, userType);
+
+    const otp = await this.otpService.crateOTP(user.email);
+    const emailOptions = new EmailOptions();
+    emailOptions.to = user.email;
+    emailOptions.html = `<p>Your OTP is: ${otp.otp}</p>
+    <p>Expires In: ${otp.expiresIn}</p>
+    `;
+    emailOptions.subject = 'Verify Your Email';
+
+    await this.emailService.sendEmail(emailOptions);
+
+    return { message: 'Verification email has been sent to your email.' };
   }
 }

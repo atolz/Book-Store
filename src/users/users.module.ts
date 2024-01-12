@@ -10,6 +10,6 @@ import { AdminEntity } from './admin.entity';
   imports: [TypeOrmModule.forFeature([User, AuthorEntity, AdminEntity])],
   providers: [UsersService],
   controllers: [UsersController],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, UsersService],
 })
 export class UsersModule {}

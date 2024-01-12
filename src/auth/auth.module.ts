@@ -5,9 +5,10 @@ import { UsersModule } from 'src/users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { EmailModule } from 'src/email/email.module';
+import { OtpModule } from 'src/otp/otp.module';
 
 @Module({
-  imports: [UsersModule, EmailModule],
+  imports: [UsersModule, EmailModule, OtpModule],
   providers: [
     AuthService,
     {

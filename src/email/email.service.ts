@@ -1,9 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { EmailOptions } from './email.model';
 const nodemailer = require('nodemailer');
+
+export const enum EmailType {
+  Verify = 'Verify',
+}
 
 @Injectable()
 export class EmailService {
-  async sendEmail(to: string, from: string): Promise<string> {
+  async sendEmail(mailOptions: EmailOptions): Promise<boolean> {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -11,16 +16,10 @@ export class EmailService {
         pass: 'ouiw dtgf xgpc nrmz',
       },
     });
-    const mailOptions = {
-      from: from, // sender address
-      to: to, // list of receivers
-      subject: 'First email test', // Subject line
-      html: '<p>Your html here</p>', // plain text body
-    };
 
-    await transporter.sendMail(mailOptions);
+    await transporter.sendMail({ from: 'Book Store', ...mailOptions });
 
-    return 'Email has been sent...';
+    return true;
 
     //  function (err, info) {
     //     if (err) console.log(err);

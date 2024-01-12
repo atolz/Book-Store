@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import {
   BeforeUpdate,
-  // BeforeInsert,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -26,7 +26,7 @@ export class OTPEntity {
   })
   expires_at: Date;
 
-  // @BeforeInsert()
+  @BeforeInsert()
   @BeforeUpdate()
   setDefaultExpiresAt() {
     // Set default value to 2 hours from the current time

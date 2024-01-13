@@ -1,5 +1,7 @@
 import {
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -173,7 +175,14 @@ export class AuthService {
   ): Promise<{ message: string }> {
     const user = await this.userService.getUser(undefined, email, userType);
 
-    const otp = await this.otpService.crateOTP(user.email);
+    if (user.verified) {
+      throw new HttpException(
+        { message: 'Account already verified', status: true },
+        HttpStatus.OK,
+      );
+    }
+
+    const otp = await this.otpService.createOTP(user.email, userType);
     const emailOptions = new EmailOptions();
     emailOptions.to = user.email;
     emailOptions.html = `<p>Your OTP is: ${otp.otp}</p>
@@ -184,5 +193,32 @@ export class AuthService {
     await this.emailService.sendEmail(emailOptions);
 
     return { message: 'Verification email has been sent to your email.' };
+  }
+
+  async verifyAccount(email: string, otp: string): Promise<any> {
+    const otpData = await this.otpService.validateOTP(email, otp);
+    let userUpdate: User & AdminEntity & AuthorEntity;
+    if (otpData.user_type == UserRolesEnum.Author) {
+      userUpdate = this.authorRepo.create({ verified: true });
+    }
+    // if (otpData.user_type == UserRolesEnum.Admin) {
+    //   userUpdate = this.adminRepo.create({ verified: true });
+    // }
+    // if (otpData.user_type == UserRolesEnum.User) {
+    //   userUpdate = this.userRepo.create({ verified: true });
+    // }
+
+    const updatedUser = await this.userService.updateUser(
+      otpData.email,
+      otpData.user_type,
+      userUpdate,
+    );
+
+    console.log('updated user is', updatedUser);
+
+    return {
+      message: 'Account verified account successfully.',
+      status: true,
+    };
   }
 }

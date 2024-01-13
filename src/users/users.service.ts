@@ -51,6 +51,34 @@ export class UsersService {
     return user;
   }
 
+  async updateUser(
+    email: string,
+    type: UserRolesEnum = UserRolesEnum.User,
+    updateData: User & AdminEntity & AuthorEntity,
+  ): Promise<User & AdminEntity & AuthorEntity> {
+    let user;
+    console.log('type user...', type, email);
+    if (type == UserRolesEnum.User) {
+      user = await this.userRepo.findOneBy({ email: email });
+      user && this.userRepo.save({ ...user, ...updateData });
+    }
+    if (type == UserRolesEnum.Author) {
+      user = await this.authorRepo.findOneBy({ email: email });
+      user && this.authorRepo.save({ ...user, ...updateData });
+    }
+    if (type == UserRolesEnum.Admin) {
+      user = await this.adminRepo.findOneBy({ email: email });
+      user && this.adminRepo.save({ ...user, ...updateData });
+    }
+    console.log('user is', user);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
   async createUser(user: CreateUserDto): Promise<User> {
     const created = this.userRepo.create(user);
 

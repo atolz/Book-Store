@@ -2,7 +2,7 @@
 import { IsEmail } from 'class-validator';
 
 /* eslint-disable prettier/prettier */
-export class VerifyEmailDTO {
+export class VerifyEmailOTPDTO {
   /**
    * @example 'ade@gmail.com'
    */

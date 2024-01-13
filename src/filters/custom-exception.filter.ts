@@ -33,8 +33,20 @@ export class CustomExceptionFilter implements ExceptionFilter {
       // Handle HTTP exceptions
       statusCode = exception.getStatus();
       message = exception.getResponse();
+      console.log('in error instance of Error', exception, message, statusCode);
 
-      return response.status(statusCode).json({ ...message, status });
+      if (message instanceof Object) {
+        return response.status(statusCode).json({
+          status,
+          statusCode,
+          ...message,
+        });
+      }
+      return response.status(statusCode).json({
+        message,
+        status,
+        statusCode,
+      });
     } else if (exception instanceof QueryFailedError) {
       // Handle validation errors
       statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -43,6 +55,7 @@ export class CustomExceptionFilter implements ExceptionFilter {
       message = Object(exception)?.constraint || exception?.message;
     } else if (exception instanceof Error && exception.message) {
       // Handle other generic errors
+      console.log('Instance of Error....', exception);
       statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
       message = exception.message;
     }

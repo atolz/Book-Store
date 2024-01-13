@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { UserRolesEnum } from 'src/users/users.enum';
 import {
   BeforeUpdate,
   BeforeInsert,
@@ -12,6 +13,9 @@ import {
 export class OTPEntity {
   @Column()
   one_time_password: string;
+
+  @Column({ type: 'enum', enum: UserRolesEnum, nullable: true })
+  user_type: UserRolesEnum;
 
   @PrimaryColumn({ unique: true })
   email: string;

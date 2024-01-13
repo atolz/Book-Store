@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OTPEntity } from './otp.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { UserRolesEnum } from 'src/users/users.enum';
 
 @Injectable()
 export class OtpService {
@@ -10,7 +11,10 @@ export class OtpService {
     @InjectRepository(OTPEntity) private otpRepo: Repository<OTPEntity>,
   ) {}
 
-  async crateOTP(email: string): Promise<{ otp: string; expiresIn: string }> {
+  async createOTP(
+    email: string,
+    userType: UserRolesEnum,
+  ): Promise<{ otp: string; expiresIn: string }> {
     const saltOrRounds = 10;
     const randPassword = `${Math.floor(Math.random() * 1000000)}`;
     const otpHash = await bcrypt.hash(randPassword, saltOrRounds);
@@ -18,6 +22,7 @@ export class OtpService {
     const otp = this.otpRepo.create({
       email: email,
       one_time_password: otpHash,
+      user_type: userType,
     });
     // console.log('otp is', otp);
     // otp.email = email;
@@ -34,5 +39,32 @@ export class OtpService {
       otp: randPassword,
       expiresIn: `2 Hours`,
     };
+  }
+
+  async validateOTP(email: string, otp: string): Promise<OTPEntity> {
+    const otpData = await this.otpRepo.findOneBy({
+      email: email,
+    });
+
+    if (!otpData) {
+      throw new BadRequestException('Invalid OTP');
+    }
+
+    const isCorrectOTP = await bcrypt.compare(otp, otpData.one_time_password);
+
+    if (!isCorrectOTP) {
+      throw new BadRequestException('Invalid OTP');
+    }
+    console.log('otp data is', otpData, isCorrectOTP);
+
+    const currentTime = Date.now();
+    const otpExpTime = otpData.expires_at.getTime();
+
+    if (currentTime > otpExpTime) {
+      throw new BadRequestException('OTP has expired');
+    }
+    // await this.otpRepo.delete({ email: email });
+
+    return otpData;
   }
 }

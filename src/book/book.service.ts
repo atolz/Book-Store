@@ -28,18 +28,7 @@ export class BookService {
     private userService: UsersService,
   ) {}
 
-  getAllBooks = async (
-    query: QueryBookDto,
-  ): Promise<{
-    data: BookEntity[];
-    pagination: {
-      current_page: number;
-      per_page: number;
-      total_pages: number;
-      total_count: number;
-      showing: number[] & any[];
-    };
-  }> => {
+  getAllBooks = async (query: QueryBookDto): Promise<BookEntity[]> => {
     let { page = 1, limit } = query;
     const { genre, search } = query;
     console.log(page, limit, genre, search);
@@ -93,22 +82,22 @@ export class BookService {
 
     // books = await bookQuery.getMany();
 
-    const data = {
-      pagination: {
-        current_page: page ?? 1,
-        per_page: limit ?? books[1],
-        total_pages: limit ? Math.ceil(books[1] / limit) : 1,
-        total_count: books[1],
-        showing:
-          page && limit && page <= Math.ceil(books[1] / limit)
-            ? [
-                (page - 1) * limit + 1,
-                page * limit > books[1] ? books[1] : page * limit,
-              ]
-            : [],
-      },
-      data: books[0],
-    };
+    // const data = {
+    //   pagination: {
+    //     current_page: page ?? 1,
+    //     per_page: limit ?? books[1],
+    //     total_pages: limit ? Math.ceil(books[1] / limit) : 1,
+    //     total_count: books[1],
+    //     showing:
+    //       page && limit && page <= Math.ceil(books[1] / limit)
+    //         ? [
+    //             (page - 1) * limit + 1,
+    //             page * limit > books[1] ? books[1] : page * limit,
+    //           ]
+    //         : [],
+    //   },
+    //   data: books[0],
+    // };
 
     // https://exercism.org/api/v2/hiring/testimonials?page=1&exercise=&order=newest_first
     //   "pagination": {
@@ -129,7 +118,7 @@ export class BookService {
     //   const to = limit ? page * limit : null;
     //   return this.books.slice(from, to);
     // }
-    return data;
+    return books[0];
   };
 
   addBook = async (

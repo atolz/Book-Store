@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Column, Entity, OneToMany, Unique } from 'typeorm';
-import { BaseUserModel } from './base-user.model';
+import { BaseUserModel } from './base-user.entity';
 import { Book } from 'src/book/book.entity';
 
 @Entity('author')

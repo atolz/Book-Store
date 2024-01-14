@@ -10,8 +10,8 @@ import {
   Request,
 } from '@nestjs/common';
 import { BookService } from './book.service';
-import { Book } from './book.model';
-import { Book as BookEntity } from './book.entity';
+// import { Book } from './book.model';
+import { Book } from './book.entity';
 import { CreateBookDTO } from './dtos/create-book.dto';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateBookDTO } from './dtos/update-book.dto';
@@ -19,7 +19,7 @@ import { QueryBookDto } from './dtos/query-book.dto';
 import { RoleGuard } from 'src/auth/role.guard';
 import { AllowRoles } from 'src/auth/role.decorator';
 import { UserRolesEnum } from 'src/users/users.enum';
-// import { CreateBookDTO } from './dtos/create-book.dto';
+import { SwaggerAPIResponse } from 'src/utils/swagger-response.dto';
 @ApiBearerAuth()
 @ApiTags('books')
 @Controller('books')
@@ -29,12 +29,13 @@ export class BookController {
   @Get()
   @ApiResponse({
     status: 200,
-    type: [CreateBookDTO],
-    description: 'The record has been successfully created.',
+    type: Book,
+    description: 'Response type for book returned.',
   })
-  getBooks(@Query() query: QueryBookDto): Promise<any> {
+  async getBooks(@Query() query: QueryBookDto): Promise<SwaggerAPIResponse> {
     console.log('query is', query);
-    return this.bookService.getAllBooks(query);
+    const data = await this.bookService.getAllBooks(query);
+    return new SwaggerAPIResponse(data);
   }
 
   @AllowRoles(UserRolesEnum.Author, UserRolesEnum.Admin)
@@ -48,7 +49,7 @@ export class BookController {
   async addBook(
     @Body() book: CreateBookDTO,
     @Request() req: Request,
-  ): Promise<BookEntity> {
+  ): Promise<Book> {
     // console.log('in book controller', book);
     const { user } = req as { user?: { id: string; role: string } };
 
@@ -61,7 +62,7 @@ export class BookController {
     type: UpdateBookDTO,
     description: 'new updated record',
   })
-  updateBook(@Param('name') name: string, @Body() book: UpdateBookDTO): Book {
+  updateBook(@Param('name') name: string, @Body() book: UpdateBookDTO): any {
     console.log('in book controller update', book);
     // console.log(typeof likes === 'number');
 

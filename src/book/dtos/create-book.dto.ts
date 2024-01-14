@@ -26,6 +26,7 @@ export class CreateBookDTO {
   @ApiProperty({
     description: 'Name of the book',
     example: 'Default book name',
+    // readOnly: true,
   })
   @IsNotEmpty()
   @IsString()

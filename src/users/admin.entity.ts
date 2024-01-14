@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Column, Entity, Unique } from 'typeorm';
-import { BaseUserModel } from './base-user.model';
+import { BaseUserModel } from './base-user.entity';
 
 export enum AdminPrivilege {
   Super = 'Super',

@@ -11,6 +11,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { EmailModule } from './email/email.module';
 import { OtpService } from './otp/otp.service';
 import { OtpModule } from './otp/otp.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { OtpModule } from './otp/otp.module';
     UsersModule,
     AuthModule,
     EmailModule,
+    ScheduleModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

@@ -20,6 +20,7 @@ import { RoleGuard } from 'src/auth/role.guard';
 import { AllowRoles } from 'src/auth/role.decorator';
 import { UserRolesEnum } from 'src/users/users.enum';
 import { SwaggerAPIResponse } from 'src/utils/swagger-response.dto';
+import { Public } from 'src/auth/public.decorator';
 @ApiBearerAuth()
 @ApiTags('books')
 @Controller('books')
@@ -27,6 +28,7 @@ export class BookController {
   constructor(private bookService: BookService) {}
 
   @Get()
+  @Public()
   @ApiResponse({
     status: 200,
     type: Book,

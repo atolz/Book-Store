@@ -29,6 +29,18 @@ export abstract class BaseUserModel {
   @Column({ nullable: true, select: false })
   password: string;
 
+  @Column({
+    type: 'simple-json',
+    nullable: true,
+  })
+  webPushSubscription: {
+    endpoint: string;
+    keys: {
+      auth: string;
+      p256dh: string;
+    };
+  };
+
   @Column({ default: () => 'NOW()' })
   createdAt: Date;
   @UpdateDateColumn()
